@@ -6,7 +6,7 @@
 #include <vector>
 
 
-enum class TileType { Empty, Mirror, Player, Laser };
+enum class TileType { Empty, Mirror, Player, Laser, Block };
 enum class Direction { None, PosX, PosY, NegX, NegY, PosSlope, NegSlope };
 
 struct Position {
@@ -20,16 +20,17 @@ struct Position {
 
 struct Tile {
 	TileType type;
-	Direction dir;
+	Direction dir=Direction::None;
 	bool type_fixed=false;
-	bool dir_fixed=false;
+	bool dir_fixed=false;  // only really used for mirrors and players
+	bool stops_laser=false;
 };
 
 std::ostream& operator<<(std::ostream& os, const Tile &t);
 
 struct Player {
 	std::string name;
-	bool is_human;
+	bool is_human=true;
 
 	// redundant but convenient
 	Position pos;
@@ -62,32 +63,66 @@ public:
 	friend std::ostream& operator<<(std::ostream& os, const Board &b);
 
 private:
-	std::vector<std::vector<Tile>> tiles_;
+	std::vector<std::vector<Tile>> tiles_;  // TODO: move to pointers and/or change entirely
 	int max_x_;
 	int max_y_;
 
 };
 
 
+// TODO: get rid of this whole class??
 class LaserGame {
 	public:
-		LaserGame(int num_players=2, int board_size_x=7, int board_size_y=7);
+		LaserGame(std::vector<Player> players=NULL, int board_size_x=7, int board_size_y=7);
 
-		void TakeTurn(Player *p);
+		// this must be a sign of bad design, but used for initializing board within the LaserGameFactory
+		bool AddPlayer(Player p);  // returns false if player is out of bounds etc.
+		bool AddPermanentEmpty(Position pos);
+		bool AddPermanentMirror(Position pos);
+		bool AddPermanentFixedMirror(Position pos);
+
+		void TakeTurn(Player p);
 
 		void PrintBoard() { std::cout << *board_ << std::endl; }
 
 	private:
 		Board* board_;
 		std::vector<Player*> players_;
-		//int turn_count_;
+		int turn_count_;
 
 };
 
 
+// TODO: pointer-ify
+class TileFactory {
+	public:
+		static Tile MakeEmpty();
+		static Tile MakeMirror(Direction dir);  // PosSlope, NegSlope
+		static Tile MakePlayer(Direction dir);  // PosX, PosY, NegX, NegY
+		static Tile MakeBlock();
+
+		// set type_fixed to true
+		static Tile MakePermanentEmpty();
+		static Tile MakePermanentBlock();
+		static Tile MakePermanentMirror(Direction dir);  // does NOT set dir_fixed to true
+		static Tile MakePermanentFixedMirror(Direction dir);
+};
+
+
+// TODO: tidy up, this is possibly being thought about wrong in general?
+// BoardFactory instead??
 class LaserGameFactory {
 	public:
-		// TODO
+		static LaserGame Make2PlayerRect(int x_len, int y_len,
+			Position player_1_pos, Position player_2_pos,
+			Direction player_1_dir, Direction player_2_dir);
+		static LaserGame Make2PlayerSquare(int len,
+			Position player_1_pos, Position player_2_pos,
+			Direction player_1_dir, Direction player_2_dir);
+
+		// square board of odd size, one imovable mirror in center square that both
+		// players face from opposite sides
+		static LaserGame Make2PlayerStandardSquare(int len);
 };
 
 #endif  // LASERGAME_H
