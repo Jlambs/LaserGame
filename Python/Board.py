@@ -11,11 +11,11 @@ class Board():
     def get_max_x(self):
         return max_x;
     def set_max_x(self, newX):
-        max_x = newX
+        self.max_x = newX
     def get_max_y(self):
         return max_y;
     def set_max_y(self, newY):
-        max_y = newY
+        self.max_y = newY
 
     ''' Builds the grid as a nested dictionary of size (xBound, yBound)
         yBound (int) :: Specifies number of rows in dictionary
@@ -23,9 +23,9 @@ class Board():
     '''
     def build_grid(self, xBound, yBound):
         for i in range(0, yBound):
-            tile_grid[i] = {}
+            self.tile_grid[i] = {}
             for j in range(0, xBound):
-                tile_grid[i][j] = Tile()
+                self.tile_grid[i][j] = Tile()
 
 
     ''' Define the initializing function for a board
@@ -37,5 +37,3 @@ class Board():
         self.set_max_x(xBound)
         self.set_max_y(yBound)
         self.build_grid(xBound, yBound)
-
-    
