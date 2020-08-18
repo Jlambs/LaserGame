@@ -9,11 +9,11 @@ class Board():
     max_y = -1
 
     def get_max_x(self):
-        return max_x;
+        return self.max_x;
     def set_max_x(self, newX):
         self.max_x = newX
     def get_max_y(self):
-        return max_y;
+        return self.max_y;
     def set_max_y(self, newY):
         self.max_y = newY
 
@@ -31,7 +31,7 @@ class Board():
         return self.tile_grid[y][x]
 
     def set_tile(self, x, y, tileType, initDirection, isDirectionFixed, isTypeFixed):
-        self.tile_grid[i][j] = Tile(initDirection, tileType, isTypeFixed, isDirectionFixed)
+        self.tile_grid[y][x] = Tile(initDirection, tileType, isTypeFixed, isDirectionFixed)
 
 
     ''' Define the initializing function for a board
@@ -44,19 +44,34 @@ class Board():
         self.set_max_y(yBound)
         self.build_grid(xBound, yBound)
 
-    def printBoard():
-        for i in range(get_max_y):
+    def printBoard(self):
+        for i in range(self.get_max_y()):
             rowString = ""
-            for j in range(get_max_x):
-                rowString += self.get_tile(i, j).get_type()
+            for j in range(self.get_max_x()):
+                rowString += self.get_tile(j, i).get_type()
             print(rowString)
 
 
     def updateLaser(self, lastX, lastY, curX, curY):
+        # Determine the direction the beam is moving
+        curDirection = 'None'
+        if (curX - lastX == -1):
+            curDirection = 'W'
+        elif (curX - lastX == 1):
+            curDirection = 'E'
+        elif (curY - lastY == -1):
+            curDirection = 'N'
+        elif (curY - lastY == 1):
+            curDirection = 'S'
+
+        print(["curX:", curX, "curY:", curY, "lastX:", lastX, "lastY:", lastY])
+
         # Get coords of next tile to check
-        nextX, nextY = self.getTile(curX, curY).propegateLaster(lastX, lastY)
+        nextX, nextY = self.get_tile(curX, curY).propegate_laser(curX, curY, curDirection)
         # Do bounds checking to see if laser extends beyond edges
-        if (nextX >= self.get_max_x()) or (nextX < 0) or (nextY >= self.get_max_y() or (nextY < 0)):
-            return ["Hit edge", x, y]
+        if (nextX == 'HIT'):
+            return "Cannon Destroyed"
+        elif (nextX >= self.get_max_x()) or (nextX < 0) or (nextY >= self.get_max_y() or (nextY < 0)):
+            return ["Hit Edge", nextX, nextY]
         else:
-            self.updateLaser(curX, curY, nextX, nextY)
+            return self.updateLaser(curX, curY, nextX, nextY)
