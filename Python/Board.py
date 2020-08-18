@@ -25,7 +25,13 @@ class Board():
         for i in range(0, yBound):
             self.tile_grid[i] = {}
             for j in range(0, xBound):
-                self.tile_grid[i][j] = Tile()
+                self.tile_grid[i][j] = Tile("None", "Empty", 0, 1)
+
+    def get_tile(self, x, y):
+        return self.tile_grid[y][x]
+
+    def set_tile(self, x, y, tileType, initDirection, isDirectionFixed, isTypeFixed):
+        self.tile_grid[i][j] = Tile(initDirection, tileType, isTypeFixed, isDirectionFixed)
 
 
     ''' Define the initializing function for a board
@@ -37,3 +43,20 @@ class Board():
         self.set_max_x(xBound)
         self.set_max_y(yBound)
         self.build_grid(xBound, yBound)
+
+    def printBoard():
+        for i in range(get_max_y):
+            rowString = ""
+            for j in range(get_max_x):
+                rowString += self.get_tile(i, j).get_type()
+            print(rowString)
+
+
+    def updateLaser(self, lastX, lastY, curX, curY):
+        # Get coords of next tile to check
+        nextX, nextY = self.getTile(curX, curY).propegateLaster(lastX, lastY)
+        # Do bounds checking to see if laser extends beyond edges
+        if (nextX >= self.get_max_x()) or (nextX < 0) or (nextY >= self.get_max_y() or (nextY < 0)):
+            return ["Hit edge", x, y]
+        else:
+            self.updateLaser(curX, curY, nextX, nextY)

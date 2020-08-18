@@ -1,15 +1,10 @@
-from GameController import GameController
-
+from Board import Board
 
 def main():
+    board = Board(5, 5)
+    board.set_tile(2, 5, 'cannon', 'N', 1, 1)
+    board.printBoard()
 
-    animals = [Wolf('Wendy'), Dog('Doug'), Crow('Cathy'), Vulture('Vick'), Cat('Carl'), Lion('Leo')]
-    keeper = ZooKeeper(animals)
-    announcer = ZooAnnoucer()
-
-    keeper.registerObserver(announcer)
-    keeper.performResponsibilities()
-    keeper.removeObserver(announcer)
 
 
 if __name__ == '__main__':
