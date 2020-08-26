@@ -28,9 +28,23 @@ class Tile():
     def set_type(self, newType, newDirection):
         if newType == 'Empty':
             self.type = '.'
+            self.direction = 'None'
             self.set_laser_action(self.empty_action)
         elif newType == 'cannon':
-            self.type = '|'
+            if newDirection == 'N':
+                self.type = '^'
+                self.direction = newDirection
+            elif newDirection == 'S':
+                self.type = 'v'
+                self.direction = newDirection
+            elif newDirection == 'E':
+                self.type = '>'
+                self.direction = newDirection
+            elif newDirection == 'W':
+                self.type = '<'
+                self.direction = newDirection
+            else:
+                raise TypeError
             self.set_laser_action(self.cannon_action)
         elif newType == 'mirror':
             if newDirection == 'pos':
